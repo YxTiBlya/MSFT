@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package mediasoft.services.restaurant;
+option go_package = "pkg/services/restaurant";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "product.proto";
+
+service MenuService {
+    rpc CreateMenu(CreateMenuRequest) returns (CreateMenuResponse) {
+        option (google.api.http) = {
+            post: "/restaurant/menu"
+            body: "*"
+        };
+    }
+    
+    rpc GetMenu(GetMenuRequest) returns (GetMenuResponse) {
+        option (google.api.http) = {
+            get: "/restaurant/menu"
+        };
+    }
+}
+
+message CreateMenuRequest {
+    google.protobuf.Timestamp on_date = 1 [(google.api.field_behavior) = REQUIRED];
+    google.protobuf.Timestamp opening_record_at = 2 [(google.api.field_behavior) = REQUIRED];
+    google.protobuf.Timestamp closing_record_at = 3 [(google.api.field_behavior) = REQUIRED];
+    repeated string salads = 4;
+    repeated string garnishes = 5;
+    repeated string meats = 6;
+    repeated string soups = 7;
+    repeated string drinks = 8;
+    repeated string desserts = 9;
+}
+
+message CreateMenuResponse {}
+
+message GetMenuRequest {
+    google.protobuf.Timestamp on_date = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetMenuResponse {
+    Menu menu = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message Menu {
+    string uuid = 1;
+    google.protobuf.Timestamp on_date = 2;
+    google.protobuf.Timestamp opening_record_at = 3;
+    google.protobuf.Timestamp closing_record_at = 4;
+    repeated Product salads = 5;
+    repeated Product garnishes = 6;
+    repeated Product meats = 7;
+    repeated Product soups = 8;
+    repeated Product drinks = 9;
+    repeated Product desserts = 10;
+    google.protobuf.Timestamp created_at = 11;
+}

@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package mediasoft.services.restaurant;
+option go_package = "pkg/services/restaurant";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+service ProductService {
+    rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse) {
+        option (google.api.http) = {
+            post: "/restaurant/products"
+            body: "*"
+        };
+    }
+    
+    rpc GetProduct(GetProductListRequest) returns (GetProductListResponse) {
+        option (google.api.http) = {
+            get: "restaurant/products"
+        };
+    }
+}
+
+message CreateProductRequest {
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
+    string description = 2 [(google.api.field_behavior) = REQUIRED];
+    ProductType type = 3 [(google.api.field_behavior) = REQUIRED];
+    int32 weight = 4 [(google.api.field_behavior) = REQUIRED];
+    double number = 5 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateProductResponse {}
+
+message GetProductListRequest {}
+
+message GetProductListResponse {
+    repeated Product result = 1;
+}
+
+message Product {
+    string uuid = 1;
+    string name = 2;
+    string description = 3;
+    ProductType type = 4;
+    int32 weight = 5;
+    double price = 6;
+    google.protobuf.Timestamp created_at = 7;
+}
+
+enum ProductType {
+    PRODUCT_TYPE_UNSPECIFIED = 0;
+    PRODUCT_TYPE_SALAD = 1;
+    PRODUCT_TYPE_GARNISH = 2;
+    PRODUCT_TYPE_MEAT = 3;
+    PRODUCT_TYPE_SOUP = 4;
+    PRODUCT_TYPE_DRINK = 5;
+    PRODUCT_TYPE_DESSERT = 6;
+}
