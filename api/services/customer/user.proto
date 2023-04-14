@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package customer;
+option go_package = "github.com/MSFT/pkg/services/customer";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/customer/users"
+            body: "*"
+        };
+    }
+
+    rpc GetUserList(GetUserListRequest) returns (GetUserListResponse) {
+        option (google.api.http) = {
+            get: "/customer/users"
+        };
+    }
+}
+
+message CreateUserRequest {
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
+    string office_uuid = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateUserResponse {
+}
+
+message GetUserListRequest {
+  string office_uuid = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetUserListResponse {
+  repeated User result = 1;
+}
+
+message User {
+  string uuid = 1;
+  string name = 2;
+  string office_uuid = 3;
+  string office_name = 4;
+  google.protobuf.Timestamp created_at = 5;
+}

@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package statistics;
+option go_package = "github.com/MSFT/pkg/services/statistics";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+service StatisticsService {
+    rpc GetAmountOfProfit(GetAmountOfProfitRequest) returns (GetAmountOfProfitResponse) {
+        option (google.api.http) = {
+            get: "/statistics/amount-of-profit"
+        };
+    }
+
+    rpc TopProducts(TopProductsRequest) returns (TopProductsResponse) {
+        option (google.api.http) = {
+            get: "/statistics/top-products"
+        };
+    }
+}
+
+message GetAmountOfProfitRequest {
+    google.protobuf.Timestamp start_date = 1 [(google.api.field_behavior) = REQUIRED];
+    google.protobuf.Timestamp end_date = 2 [(google.api.field_behavior) = REQUIRED];
+}
+  
+message GetAmountOfProfitResponse {
+    double profit = 1;
+}
+  
+message TopProductsRequest {
+    google.protobuf.Timestamp start_date = 1;
+    google.protobuf.Timestamp end_date = 2;
+    optional StatisticsProductType product_type = 3;
+}
+  
+message TopProductsResponse {
+    repeated Product result = 1;
+}
+  
+message Product {
+    string uuid = 1;
+    string name = 2;
+    int64 count = 3;
+    StatisticsProductType product_type = 4;
+}
+  
+enum StatisticsProductType {
+    ST_PRODUCT_TYPE_UNSPECIFIED = 0;
+    ST_PRODUCT_TYPE_SALAD = 1;
+    ST_PRODUCT_TYPE_GARNISH = 2;
+    ST_PRODUCT_TYPE_MEAT = 3;
+    ST_PRODUCT_TYPE_SOUP = 4;
+    ST_PRODUCT_TYPE_DRINK = 5;
+    ST_PRODUCT_TYPE_DESSERT = 6;
+}
+  

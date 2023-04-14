@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package customer;
+option go_package = "github.com/MSFT/pkg/services/customer";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+service OrderService {
+    rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+        option (google.api.http) = {
+            post: "/customer/users/orders"
+            body: "*"
+        };
+    }
+  
+    rpc GetActualMenu(GetActualMenuRequest) returns (GetActualMenuResponse) {
+        option (google.api.http) = {
+            get: "/customer/users/orders"
+        };
+    }
+}
+  
+message CreateOrderRequest {
+    string user_uuid = 1 [(google.api.field_behavior) = REQUIRED];
+    repeated OrderItem salads = 2;
+    repeated OrderItem garnishes =  3;
+    repeated OrderItem meats = 4;
+    repeated OrderItem soups = 5;
+    repeated OrderItem drinks = 6;
+    repeated OrderItem desserts = 7;
+}
+  
+message CreateOrderResponse {}
+  
+message GetActualMenuRequest {
+    repeated Product salads = 1;
+    repeated Product garnishes = 2;
+    repeated Product meats = 3;
+    repeated Product soups = 4;
+    repeated Product drinks = 5;
+    repeated Product desserts = 6;
+}
+  
+message GetActualMenuResponse {}
+  
+message OrderItem {
+    int32 count = 1;
+    string product_uuid = 2;
+}
+  
+message Product {
+    string uuid = 1;
+    string name = 2;
+    string description = 3;
+    CustomerProductType type = 4;
+    int32 weight = 5;
+    double price = 6;
+    google.protobuf.Timestamp created_at = 7;
+}
+  
+enum CustomerProductType {
+    CUSTOMER_PRODUCT_TYPE_UNSPECIFIED = 0;
+    CUSTOMER_PRODUCT_TYPE_SALAD = 1;
+    CUSTOMER_PRODUCT_TYPE_GARNISH = 2;
+    CUSTOMER_PRODUCT_TYPE_MEAT = 3;
+    CUSTOMER_PRODUCT_TYPE_SOUP = 4;
+    CUSTOMER_PRODUCT_TYPE_DRINK = 5;
+    CUSTOMER_PRODUCT_TYPE_DESSERT = 6;
+}

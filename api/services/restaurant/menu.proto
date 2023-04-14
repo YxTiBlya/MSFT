@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package mediasoft.services.restaurant;
-option go_package = "pkg/services/restaurant";
+package restaurant;
+option go_package = "github.com/MSFT/pkg/services/restaurant";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
