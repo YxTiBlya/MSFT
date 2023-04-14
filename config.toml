@@ -1,0 +1,17 @@
+general_host = "localhost"
+general_port = 5000
+
+restaurant_service_port = 5001
+customer_service_port   = 5002
+statistics_service_port = 5003
+
+postgres_username = "yxtiblya"
+postgres_password = "password"
+postgres_host     = "localhost"
+postgres_port     = 5432
+postgres_dbname   = "MSFT"
+postgres_ssl      = "disable"
+
+# postgres_restaurant_dbname = "restaurant"
+# postgres_consumer_dbname =   "consumer"
+# postgres_statistics_dbname = "statistics"
