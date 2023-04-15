@@ -34,7 +34,11 @@ func main() {
 
 	r.GET("/restaurant/menu", handlers.MenuRequest)
 	r.POST("/restaurant/menu", handlers.MenuRequest)
+	r.GET("/restaurant/orders", handlers.OrderRequest)
+	r.GET("/restaurant/products", handlers.ProductRequest)
+	r.POST("/restaurant/products", handlers.ProductRequest)
 
+	// serve
 	if err := r.Run(fmt.Sprintf(":%d", config.General_port)); err != nil {
 		panic("failed to start server:\n" + err.Error())
 	}
