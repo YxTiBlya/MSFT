@@ -14,21 +14,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// type server_s struct {
-// 	pb.UnimplementedMenuServiceServer
-// }
-
-// func (s *server_s) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
-// 	log.Println("MENU GET REQUEST")
-// 	return &pb.GetMenuResponse{}, nil
-// }
-
-// func (s *server_s) CreateMenu(ctx context.Context, in *pb.CreateMenuRequest) (*pb.CreateMenuResponse, error) {
-// 	log.Println("MENU CREATED AND ADDED TO DB")
-
-// 	return &pb.CreateMenuResponse{}, nil
-// }
-
 func main() {
 	// parse and update config
 	config := cfg.GetConfig()
