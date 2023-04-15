@@ -32,8 +32,8 @@ func main() {
 	r := gin.New()
 	r.Use(middlewares.Logger(), gin.Recovery())
 
-	r.GET("/restaurant/menu", handlers.GetMenuRequest)
-	r.POST("/restaurant/menu")
+	r.GET("/restaurant/menu", handlers.MenuRequest)
+	r.POST("/restaurant/menu", handlers.MenuRequest)
 
 	if err := r.Run(fmt.Sprintf(":%d", config.General_port)); err != nil {
 		panic("failed to start server:\n" + err.Error())
