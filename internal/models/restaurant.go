@@ -4,6 +4,9 @@ import (
 	"time"
 )
 
+type Restaurant struct {
+}
+
 type CreateMenuRequest struct {
 	OnDate          time.Time `json:"on_date"`
 	OpeningRecordAt time.Time `json:"opening_record_at"`
