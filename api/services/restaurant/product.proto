@@ -17,7 +17,7 @@ service ProductService {
     
     rpc GetProduct(GetProductListRequest) returns (GetProductListResponse) {
         option (google.api.http) = {
-            get: "restaurant/products"
+            get: "/restaurant/products"
         };
     }
 }
@@ -27,7 +27,7 @@ message CreateProductRequest {
     string description = 2 [(google.api.field_behavior) = REQUIRED];
     ProductType type = 3 [(google.api.field_behavior) = REQUIRED];
     int32 weight = 4 [(google.api.field_behavior) = REQUIRED];
-    double number = 5 [(google.api.field_behavior) = REQUIRED];
+    double price = 5 [(google.api.field_behavior) = REQUIRED];
 }
 
 message CreateProductResponse {}
