@@ -2,9 +2,25 @@ package models
 
 import (
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
-type Restaurant struct {
+type Products struct {
+	//ID          string  `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+	Id          string  `gorm:"primaryKey"`
+	Name        string  `gorm:"type:varchar(100);not null"`
+	Description string  `gorm:"type:text;not null"`
+	Type        int32   `gorm:"not null"`
+	Weight      int32   `gorm:"not null"`
+	Price       float64 `gorm:"type:double precision"`
+	CreatedAt   string  `gorm:"type:varchar(100);not null"`
+}
+
+func (p *Products) BeforeCreate(tx *gorm.DB) (err error) {
+	p.Id = uuid.NewString()
+	return
 }
 
 type CreateMenuRequest struct {
