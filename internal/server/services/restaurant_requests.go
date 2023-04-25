@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -82,7 +83,7 @@ func ProductRequest(c *gin.Context) {
 	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"code":    http.StatusServiceUnavailable,
+			"code":    int(status.FromContextError(err).Code()),
 			"message": "service is unavailable",
 			"details": nil,
 		})
@@ -98,11 +99,31 @@ func ProductRequest(c *gin.Context) {
 	case "GET":
 		r, err := client.GetProduct(ctx, &pb.GetProductListRequest{})
 		if err != nil {
-			//c.JSON(http.StatusBadRequest, gin.H{})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    int(status.FromContextError(err).Code()),
+				"message": err,
+				"details": nil,
+			})
 			return
 		}
 
-		c.JSON(http.StatusOK, r)
+		var products []map[string]any
+
+		for _, item := range r.Result {
+			products = append(products, map[string]any{
+				"uuid":        item.Uuid,
+				"name":        item.Name,
+				"description": item.Description,
+				"type":        pb.ProductType_name[int32(item.Type)],
+				"weight":      item.Weight,
+				"price":       item.Price,
+				"created_at":  time.Unix(item.CreatedAt.Seconds, int64(item.CreatedAt.Nanos)).Format(time.RFC3339),
+			})
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"result": products,
+		})
 
 	case "POST":
 		var request map[string]any
@@ -123,7 +144,11 @@ func ProductRequest(c *gin.Context) {
 			Price:       request["price"].(float64),
 		})
 		if err != nil {
-			//
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    int(status.FromContextError(err).Code()),
+				"message": err,
+				"details": nil,
+			})
 			return
 		}
 
