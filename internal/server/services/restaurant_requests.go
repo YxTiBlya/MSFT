@@ -18,6 +18,22 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+func convertProductResponse(items []*pb.Product) []any {
+	var products []any
+	for _, product := range items {
+		products = append(products, map[string]any{
+			"uuid":        product.Uuid,
+			"name":        product.Name,
+			"description": product.Description,
+			"type":        pb.ProductType_name[int32(product.Type)],
+			"weight":      product.Weight,
+			"price":       product.Price,
+			"created_at":  time.Unix(product.CreatedAt.Seconds, int64(product.CreatedAt.Nanos)).Format(time.RFC3339),
+		})
+	}
+	return products
+}
+
 func MenuRequest(c *gin.Context) {
 	config := cfg.GetConfig()
 
@@ -38,20 +54,52 @@ func MenuRequest(c *gin.Context) {
 
 	switch c.Request.Method {
 	case "GET":
-		r, err := client.GetMenu(ctx, &pb.GetMenuRequest{OnDate: timestamppb.Now()})
+		grpc_response, err := client.GetMenu(ctx, &pb.GetMenuRequest{OnDate: timestamppb.Now()})
 		if err != nil {
-			//c.JSON(http.StatusBadRequest, status.FromContextError(err))
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    int(status.FromContextError(err).Code()),
+				"message": err,
+				"details": nil,
+			})
 			return
 		}
 
-		c.JSON(http.StatusOK, r)
+		response := make(map[string]any)
+		response["uuid"] = grpc_response.Menu.Uuid
+		response["on_date"] = time.Unix(grpc_response.Menu.OnDate.Seconds, int64(grpc_response.Menu.OnDate.Nanos)).Format(time.RFC3339)
+		response["opening_record_at"] = time.Unix(grpc_response.Menu.OpeningRecordAt.Seconds, int64(grpc_response.Menu.OpeningRecordAt.Nanos)).Format(time.RFC3339)
+		response["closing_record_at"] = time.Unix(grpc_response.Menu.ClosingRecordAt.Seconds, int64(grpc_response.Menu.ClosingRecordAt.Nanos)).Format(time.RFC3339)
+		response["created_at"] = time.Unix(grpc_response.Menu.CreatedAt.Seconds, int64(grpc_response.Menu.CreatedAt.Nanos)).Format(time.RFC3339)
+
+		if grpc_response.Menu.Salads != nil {
+			response["salads"] = convertProductResponse(grpc_response.Menu.Salads)
+		}
+		if grpc_response.Menu.Garnishes != nil {
+			response["garnishes"] = convertProductResponse(grpc_response.Menu.Garnishes)
+		}
+		if grpc_response.Menu.Meats != nil {
+			response["meats"] = convertProductResponse(grpc_response.Menu.Meats)
+		}
+		if grpc_response.Menu.Soups != nil {
+			response["soups"] = convertProductResponse(grpc_response.Menu.Soups)
+		}
+		if grpc_response.Menu.Drinks != nil {
+			response["drinks"] = convertProductResponse(grpc_response.Menu.Drinks)
+		}
+		if grpc_response.Menu.Desserts != nil {
+			response["desserts"] = convertProductResponse(grpc_response.Menu.Desserts)
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"menu": response,
+		})
 
 	case "POST":
 		var request models.CreateMenuRequest
 		if err := json.NewDecoder(c.Request.Body).Decode(&request); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"code":    http.StatusBadRequest,
-				"message": "request body is not parsed",
+				"code":    int(status.FromContextError(err).Code()),
+				"message": err,
 				"details": nil,
 			})
 			return
@@ -69,7 +117,11 @@ func MenuRequest(c *gin.Context) {
 			Desserts:        request.Desserts,
 		})
 		if err != nil {
-			//c.JSON(http.StatusBadRequest, status.FromContextError(err))
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"code":    int(status.FromContextError(err).Code()),
+				"message": err,
+				"details": nil,
+			})
 			return
 		}
 
@@ -84,7 +136,7 @@ func ProductRequest(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"code":    int(status.FromContextError(err).Code()),
-			"message": "service is unavailable",
+			"message": err,
 			"details": nil,
 		})
 		return
@@ -107,19 +159,7 @@ func ProductRequest(c *gin.Context) {
 			return
 		}
 
-		var products []map[string]any
-
-		for _, item := range r.Result {
-			products = append(products, map[string]any{
-				"uuid":        item.Uuid,
-				"name":        item.Name,
-				"description": item.Description,
-				"type":        pb.ProductType_name[int32(item.Type)],
-				"weight":      item.Weight,
-				"price":       item.Price,
-				"created_at":  time.Unix(item.CreatedAt.Seconds, int64(item.CreatedAt.Nanos)).Format(time.RFC3339),
-			})
-		}
+		products := convertProductResponse(r.Result)
 
 		c.JSON(http.StatusOK, gin.H{
 			"result": products,
@@ -162,8 +202,8 @@ func OrderRequest(c *gin.Context) {
 	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"code":    http.StatusServiceUnavailable,
-			"message": "service is unavailable",
+			"code":    int(status.FromContextError(err).Code()),
+			"message": err,
 			"details": nil,
 		})
 		return
