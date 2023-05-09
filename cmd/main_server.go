@@ -7,7 +7,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/MSFT/internal/cfg"
-	handlers "github.com/MSFT/internal/server/services"
+	customer_handlers "github.com/MSFT/internal/server/services/customer"
+	restaurant_handlers "github.com/MSFT/internal/server/services/restaurant"
 	"github.com/MSFT/middlewares"
 	"github.com/gin-gonic/gin"
 )
@@ -32,11 +33,16 @@ func main() {
 	r := gin.New()
 	r.Use(middlewares.Logger(), gin.Recovery())
 
-	r.GET("/restaurant/menu", handlers.MenuRequest)
-	r.POST("/restaurant/menu", handlers.MenuRequest)
-	r.GET("/restaurant/orders", handlers.OrderRequest)
-	r.GET("/restaurant/products", handlers.ProductRequest)
-	r.POST("/restaurant/products", handlers.ProductRequest)
+	// restaurant urls
+	r.GET("/restaurant/menu", restaurant_handlers.MenuRequest)
+	r.POST("/restaurant/menu", restaurant_handlers.MenuRequest)
+	r.GET("/restaurant/orders", restaurant_handlers.OrderRequest)
+	r.GET("/restaurant/products", restaurant_handlers.ProductRequest)
+	r.POST("/restaurant/products", restaurant_handlers.ProductRequest)
+
+	// customer urls
+	r.GET("/customer/offices", customer_handlers.OfficeRequest)
+	r.POST("/customer/offices", customer_handlers.OfficeRequest)
 
 	// serve
 	if err := r.Run(fmt.Sprintf(":%d", config.General_port)); err != nil {
