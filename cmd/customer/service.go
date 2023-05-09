@@ -8,9 +8,9 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/MSFT/internal/cfg"
-	restaurant_handlers "github.com/MSFT/internal/server/services/restaurant"
+	customer_handlers "github.com/MSFT/internal/server/services/customer"
 	"github.com/MSFT/internal/store"
-	pb "github.com/MSFT/pkg/services/restaurant"
+	pb "github.com/MSFT/pkg/services/customer"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// logger init
-	logger_file, err := os.OpenFile("logger/restaurant.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	logger_file, err := os.OpenFile("logger/customer.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic("failed to create or opening the logger file:\n" + err.Error())
 	}
@@ -36,17 +36,17 @@ func main() {
 	//log.SetOutput(logger_file)
 
 	// listener init
-	listener, err := net.Listen("tcp", fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_service_port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%v:%d", config.General_host, config.Customer_service_port))
 	if err != nil {
 		log.Fatalln("failed to listen:\n" + err.Error())
 	}
 
 	// init grpc server
 	server := grpc.NewServer()
-	server_model := restaurant_handlers.RestaurantServer{}
-	pb.RegisterMenuServiceServer(server, &server_model)
+	server_model := customer_handlers.CustomerServer{}
+	pb.RegisterOfficeServiceServer(server, &server_model)
 	pb.RegisterOrderServiceServer(server, &server_model)
-	pb.RegisterProductServiceServer(server, &server_model)
+	pb.RegisterUserServiceServer(server, &server_model)
 
 	// serve
 	log.Printf("server listening at %v", listener.Addr())
