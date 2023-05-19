@@ -34,7 +34,9 @@ message CreateOrderRequest {
   
 message CreateOrderResponse {}
   
-message GetActualMenuRequest {
+message GetActualMenuRequest {}
+  
+message GetActualMenuResponse {
     repeated Product salads = 1;
     repeated Product garnishes = 2;
     repeated Product meats = 3;
@@ -42,8 +44,6 @@ message GetActualMenuRequest {
     repeated Product drinks = 5;
     repeated Product desserts = 6;
 }
-  
-message GetActualMenuResponse {}
   
 message OrderItem {
     int32 count = 1;
