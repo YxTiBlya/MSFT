@@ -1,17 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net"
 	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/MSFT/internal/cfg"
-	customer_handlers "github.com/MSFT/internal/server/services/customer"
+	"github.com/MSFT/internal/gateway"
+	gateway_customer "github.com/MSFT/internal/gateway/customer"
 	"github.com/MSFT/internal/store"
-	pb "github.com/MSFT/pkg/services/customer"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -35,22 +32,8 @@ func main() {
 	defer logger_file.Close()
 	//log.SetOutput(logger_file)
 
-	// listener init
-	listener, err := net.Listen("tcp", fmt.Sprintf("%v:%d", config.General_host, config.Customer_service_port))
-	if err != nil {
-		log.Fatalln("failed to listen:\n" + err.Error())
-	}
-
-	// init grpc server
-	server := grpc.NewServer()
-	server_model := customer_handlers.CustomerServer{}
-	pb.RegisterOfficeServiceServer(server, &server_model)
-	pb.RegisterOrderServiceServer(server, &server_model)
-	pb.RegisterUserServiceServer(server, &server_model)
-
 	// serve
-	log.Printf("server listening at %v", listener.Addr())
-	if err := server.Serve(listener); err != nil {
-		panic("failed to start server:\n" + err.Error())
+	if err := gateway.Run(config, &gateway_customer.CustomerServer{}); err != nil {
+		log.Fatal("error running gateway server ", err)
 	}
 }
