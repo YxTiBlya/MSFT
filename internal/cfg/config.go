@@ -2,11 +2,15 @@ package cfg
 
 type Config struct {
 	General_host string
-	General_port int32
 
-	Restaurant_service_port int32
-	Customer_service_port   int32
-	Statistics_service_port int32
+	Restaurant_grpc_service_port int32
+	Restaurant_http_service_port int32
+
+	Customer_grpc_service_port int32
+	Customer_http_service_port int32
+
+	Statistics_grpc_service_port int32
+	Statistics_http_service_port int32
 
 	Postgres_username string
 	Postgres_password string
