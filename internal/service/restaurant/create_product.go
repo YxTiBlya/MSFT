@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/MSFT/internal/models"
+	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
 	pb "github.com/MSFT/pkg/services/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -15,7 +15,7 @@ import (
 func (s *RestaurantService) CreateProduct(ctx context.Context, in *pb.CreateProductRequest) (*pb.CreateProductResponse, error) {
 	nowTime := timestamppb.New(time.Now())
 
-	product := models.Product{
+	product := restaurant_models.Product{
 		Name:        in.Name,
 		Description: in.Description,
 		Type:        pb.ProductType_value[in.Type.String()],
@@ -24,7 +24,7 @@ func (s *RestaurantService) CreateProduct(ctx context.Context, in *pb.CreateProd
 		CreatedAt:   fmt.Sprintf("%v.%v", nowTime.Seconds, nowTime.Nanos),
 	}
 
-	if err := store.DB.Model(&models.Product{}).Create(&product).Error; err != nil {
+	if err := store.DB.Model(&restaurant_models.Product{}).Create(&product).Error; err != nil {
 		log.Println("PRODUCT: CreateProduct error:\n", err)
 		return nil, err
 	}

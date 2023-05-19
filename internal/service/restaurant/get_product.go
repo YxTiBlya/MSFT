@@ -4,17 +4,17 @@ import (
 	"context"
 	"log"
 
-	"github.com/MSFT/internal/models"
+	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
 	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
 )
 
 func (s *RestaurantService) GetProduct(ctx context.Context, in *pb.GetProductListRequest) (*pb.GetProductListResponse, error) {
-	var products []models.Product
+	var products []restaurant_models.Product
 	var result []*pb.Product
 
-	if err := store.DB.Model(&models.Product{}).Find(&products).Error; err != nil {
+	if err := store.DB.Model(&restaurant_models.Product{}).Find(&products).Error; err != nil {
 		log.Println("PRODUCT: GetProduct error:\n", err)
 		return nil, err
 	}

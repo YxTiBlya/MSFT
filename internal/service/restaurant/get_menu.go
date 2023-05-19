@@ -4,15 +4,15 @@ import (
 	"context"
 	"log"
 
-	"github.com/MSFT/internal/models"
+	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
 	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
 )
 
 func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
-	var menu models.Menu
-	if err := store.DB.Model(&models.Menu{}).First(&menu).Error; err != nil {
+	var menu restaurant_models.Menu
+	if err := store.DB.Model(&restaurant_models.Menu{}).First(&menu).Error; err != nil {
 		log.Println("MENU: GetMenu error:\n", err.Error())
 		return nil, err
 	}
