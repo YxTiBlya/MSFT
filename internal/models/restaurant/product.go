@@ -1,4 +1,4 @@
-package models
+package restaurant_models
 
 import (
 	"database/sql/driver"
