@@ -1,9 +1,13 @@
 general_host = "localhost"
-general_port = 5000
 
-restaurant_service_port = 5001
-customer_service_port   = 5002
-statistics_service_port = 5003
+restaurant_grpc_service_port = 5001
+restaurant_http_service_port = 5002
+
+customer_grpc_service_port   = 5003
+customer_http_service_port   = 5004
+
+statistics_grpc_service_port = 5005
+statistics_http_service_port = 5006
 
 postgres_username = "yxtiblya"
 postgres_password = "password"
