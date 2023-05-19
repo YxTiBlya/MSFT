@@ -4,13 +4,11 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"strconv"
-	"strings"
 
+	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
 
@@ -42,10 +40,6 @@ func (p *Product) Scan(src any) error {
 }
 
 func (p *Product) ToGRPCModel() *pb.Product {
-	createdAtTMP := strings.Split(p.CreatedAt, ".")
-	secs, _ := strconv.Atoi(createdAtTMP[0])
-	nans, _ := strconv.Atoi(createdAtTMP[1])
-
 	return &pb.Product{
 		Uuid:        p.Uuid,
 		Name:        p.Name,
@@ -53,7 +47,7 @@ func (p *Product) ToGRPCModel() *pb.Product {
 		Type:        pb.ProductType(p.Type),
 		Weight:      p.Weight,
 		Price:       p.Price,
-		CreatedAt:   &timestamppb.Timestamp{Seconds: int64(secs), Nanos: int32(nans)},
+		CreatedAt:   timestamp.ToTimestamppb(p.CreatedAt),
 	}
 }
 
