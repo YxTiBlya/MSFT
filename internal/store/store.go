@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/MSFT/internal/cfg"
-	"github.com/MSFT/internal/models"
+	customer_models "github.com/MSFT/internal/models/customer"
+	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -21,8 +22,11 @@ func ConnToDB(c *cfg.Config) (*gorm.DB, error) {
 	}
 
 	DB.AutoMigrate(
-		&models.Product{},
-		&models.Menu{},
+		&restaurant_models.Product{},
+		&restaurant_models.Menu{},
+
+		&customer_models.Office{},
+		&customer_models.User{},
 	)
 
 	return DB, nil
