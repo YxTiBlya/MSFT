@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/MSFT/internal/cfg"
+	"github.com/MSFT/internal/rabbitmq"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
@@ -18,13 +19,16 @@ type server interface {
 	RuntHTTPServer(context.Context, *cfg.Config, *runtime.ServeMux)
 }
 
-func Run(cfg *cfg.Config, server server) error {
+func Run(cfg *cfg.Config, server server, recieve_broker bool) error {
 	s := grpc.NewServer()
 	mux := runtime.NewServeMux()
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go server.RunGRPCServer(cfg, s)
 	go server.RuntHTTPServer(ctx, cfg, mux)
+	if recieve_broker {
+		go rabbitmq.RecieveOrder(cfg)
+	}
 
 	gracefulShutDown(s, cancel)
 
