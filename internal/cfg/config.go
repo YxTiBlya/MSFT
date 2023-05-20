@@ -1,7 +1,8 @@
 package cfg
 
 type Config struct {
-	General_host string
+	General_host    string
+	Logging_in_file bool
 
 	Restaurant_grpc_service_port int32
 	Restaurant_http_service_port int32
@@ -11,6 +12,10 @@ type Config struct {
 
 	Statistics_grpc_service_port int32
 	Statistics_http_service_port int32
+
+	Rabbitmq_host       string
+	Rabbitmq_port       int32
+	Rabbitmq_queue_name string
 
 	Postgres_username string
 	Postgres_password string
