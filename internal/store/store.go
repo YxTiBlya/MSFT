@@ -24,6 +24,7 @@ func ConnToDB(c *cfg.Config) (*gorm.DB, error) {
 	DB.AutoMigrate(
 		&restaurant_models.Product{},
 		&restaurant_models.Menu{},
+		&restaurant_models.Orders{},
 
 		&customer_models.Office{},
 		&customer_models.User{},
