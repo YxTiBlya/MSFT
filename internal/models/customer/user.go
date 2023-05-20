@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -11,11 +12,11 @@ import (
 )
 
 type User struct {
-	Uuid        string `gorm:"primaryKey"`
-	Name        string `gorm:"type:varchar(50);not null"`
-	Office_uuid string `gorm:"type:varchar(100);not null"`
-	Office_name string `gorm:"type:varchar(100);not null"`
-	CreatedAt   string `gorm:"type:varchar(100);not null"`
+	Uuid        string    `gorm:"primaryKey"`
+	Name        string    `gorm:"type:varchar(50);not null"`
+	Office_uuid string    `gorm:"type:varchar(100);not null"`
+	Office_name string    `gorm:"type:varchar(100);not null"`
+	CreatedAt   time.Time `gorm:"not null"`
 }
 
 func (p *User) BeforeCreate(tx *gorm.DB) (err error) {

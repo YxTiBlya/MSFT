@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
@@ -13,13 +14,13 @@ import (
 )
 
 type Product struct {
-	Uuid        string  `gorm:"primaryKey"`
-	Name        string  `gorm:"type:varchar(100);not null"`
-	Description string  `gorm:"type:text;not null"`
-	Type        int32   `gorm:"not null"`
-	Weight      int32   `gorm:"not null"`
-	Price       float64 `gorm:"type:double precision"`
-	CreatedAt   string  `gorm:"type:varchar(100);not null"`
+	Uuid        string    `gorm:"primaryKey"`
+	Name        string    `gorm:"type:varchar(100);not null"`
+	Description string    `gorm:"type:text;not null"`
+	Type        int32     `gorm:"not null"`
+	Weight      int32     `gorm:"not null"`
+	Price       float64   `gorm:"type:double precision"`
+	CreatedAt   time.Time `gorm:"not null"`
 }
 
 func (p *Product) BeforeCreate(tx *gorm.DB) (err error) {

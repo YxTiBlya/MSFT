@@ -2,14 +2,12 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
 	pb "github.com/MSFT/pkg/services/restaurant"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuRequest) (*pb.CreateMenuResponse, error) {
@@ -22,18 +20,17 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 	store.DB.Model(&restaurant_models.Product{}).Where("uuid IN ?", in.Drinks).Find(&drinks)
 	store.DB.Model(&restaurant_models.Product{}).Where("uuid IN ?", in.Desserts).Find(&desserts)
 
-	created_at_time := timestamppb.New(time.Now())
 	menu := restaurant_models.Menu{
-		OnDate:          fmt.Sprintf("%v.%v", in.OnDate.Seconds, in.OnDate.Nanos),
-		OpeningRecordAt: fmt.Sprintf("%v.%v", in.OpeningRecordAt.Seconds, in.OpeningRecordAt.Nanos),
-		ClosingRecordAt: fmt.Sprintf("%v.%v", in.ClosingRecordAt.Seconds, in.ClosingRecordAt.Nanos),
+		OnDate:          in.OnDate.AsTime(),
+		OpeningRecordAt: in.OpeningRecordAt.AsTime(),
+		ClosingRecordAt: in.ClosingRecordAt.AsTime(),
 		Salads:          salads,
 		Garnishes:       garnishes,
 		Meats:           meats,
 		Soups:           soups,
 		Drinks:          drinks,
 		Desserts:        desserts,
-		CreatedAt:       fmt.Sprintf("%v.%v", created_at_time.Seconds, created_at_time.Nanos),
+		CreatedAt:       time.Now(),
 	}
 
 	if err := store.DB.Model(&restaurant_models.Menu{}).Create(&menu).Error; err != nil {

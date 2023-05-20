@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log"
+	"time"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
@@ -12,7 +13,16 @@ import (
 
 func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
 	var menu restaurant_models.Menu
-	if err := store.DB.Model(&restaurant_models.Menu{}).First(&menu).Error; err != nil {
+
+	onDate := time.Unix(in.OnDate.Seconds, int64(in.OnDate.Nanos))
+	onDateY := onDate.Year()
+	onDateM := onDate.Month()
+	onDateD := onDate.Day()
+
+	startDate := time.Date(onDateY, onDateM, onDateD, 0, 0, 0, 0, time.Local)
+	endDate := time.Date(onDateY, onDateM, onDateD+1, 0, 0, 0, 0, time.Local)
+
+	if err := store.DB.Model(&restaurant_models.Menu{}).Where("on_date > ? AND on_date < ?", startDate, endDate).First(&menu).Error; err != nil {
 		log.Println("MENU: GetMenu error:\n", err.Error())
 		return nil, err
 	}
