@@ -20,9 +20,9 @@ func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) 
 	onDateD := onDate.Day()
 
 	startDate := time.Date(onDateY, onDateM, onDateD, 0, 0, 0, 0, time.Local)
-	endDate := time.Date(onDateY, onDateM, onDateD+1, 0, 0, 0, 0, time.Local)
+	endDate := time.Date(onDateY, onDateM, onDateD, 23, 59, 59, 0, time.Local)
 
-	if err := store.DB.Model(&restaurant_models.Menu{}).Where("on_date > ? AND on_date < ?", startDate, endDate).First(&menu).Error; err != nil {
+	if err := store.DB.Model(&restaurant_models.Menu{}).Where("on_date >= ? AND on_date <= ?", startDate, endDate).First(&menu).Error; err != nil {
 		log.Println("MENU: GetMenu error:\n", err.Error())
 		return nil, err
 	}
