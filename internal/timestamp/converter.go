@@ -7,7 +7,7 @@ import (
 )
 
 func ToTimestamppb(tm time.Time) *timestamppb.Timestamp {
-	converted_time := time.Date(
+	convertered_time := time.Date(
 		tm.Year(),
 		tm.Month(),
 		tm.Day(),
@@ -18,5 +18,5 @@ func ToTimestamppb(tm time.Time) *timestamppb.Timestamp {
 		time.Local,
 	)
 
-	return &timestamppb.Timestamp{Seconds: converted_time.Unix()}
+	return &timestamppb.Timestamp{Seconds: convertered_time.Unix()}
 }
