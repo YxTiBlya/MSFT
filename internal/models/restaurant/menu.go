@@ -11,16 +11,16 @@ import (
 
 type Menu struct {
 	Uuid            string       `gorm:"primaryKey"`
-	OnDate          time.Time    `gorm:"not null"`
-	OpeningRecordAt time.Time    `gorm:"not null"`
-	ClosingRecordAt time.Time    `gorm:"not null"`
+	OnDate          time.Time    `gorm:"type:timestamp without time zone; not null"`
+	OpeningRecordAt time.Time    `gorm:"type:timestamp without time zone; not null"`
+	ClosingRecordAt time.Time    `gorm:"type:timestamp without time zone; not null"`
 	Salads          ProductArray `gorm:"type:jsonb[]"`
 	Garnishes       ProductArray `gorm:"type:jsonb[]"`
 	Meats           ProductArray `gorm:"type:jsonb[]"`
 	Soups           ProductArray `gorm:"type:jsonb[]"`
 	Drinks          ProductArray `gorm:"type:jsonb[]"`
 	Desserts        ProductArray `gorm:"type:jsonb[]"`
-	CreatedAt       time.Time    `gorm:"not null"`
+	CreatedAt       time.Time    `gorm:"type:timestamp without time zone; not null"`
 }
 
 type CreateMenuRequest struct {

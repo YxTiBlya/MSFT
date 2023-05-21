@@ -15,7 +15,7 @@ type Office struct {
 	Uuid      string    `gorm:"primaryKey"`
 	Name      string    `gorm:"type:varchar(50);not null"`
 	Address   string    `gorm:"type:varchar(100);not null"`
-	CreatedAt time.Time `gorm:"not null"`
+	CreatedAt time.Time `gorm:"type:timestamp without time zone; not null"`
 }
 
 func (p *Office) BeforeCreate(tx *gorm.DB) (err error) {

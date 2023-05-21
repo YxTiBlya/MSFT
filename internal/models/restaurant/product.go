@@ -20,7 +20,7 @@ type Product struct {
 	Type        int32     `gorm:"not null"`
 	Weight      int32     `gorm:"not null"`
 	Price       float64   `gorm:"type:double precision"`
-	CreatedAt   time.Time `gorm:"not null"`
+	CreatedAt   time.Time `gorm:"type:timestamp without time zone; not null"`
 }
 
 func (p *Product) BeforeCreate(tx *gorm.DB) (err error) {
