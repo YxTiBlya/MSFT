@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
@@ -34,10 +35,10 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 	}
 
 	if err := store.DB.Model(&restaurant_models.Menu{}).Create(&menu).Error; err != nil {
-		log.Println("MENU: CreateMenu error:\n", err)
+		log.Errorln("MENU: CreateMenu error:", err)
 		return nil, err
 	}
 
-	log.Println("MENU: CreateMenu:\n", in)
+	log.Infoln("MENU: CreateMenu:", in)
 	return &pb.CreateMenuResponse{}, nil
 }

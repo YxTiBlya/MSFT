@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	customer_models "github.com/MSFT/internal/models/customer"
 	"github.com/MSFT/internal/store"
@@ -15,7 +16,7 @@ func (s *CustomerService) GetOfficeList(ctx context.Context, in *pb.GetOfficeLis
 	var result []*pb.Office
 
 	if err := store.DB.Model(&customer_models.Office{}).Find(&offices).Error; err != nil {
-		log.Println("OFFICE: GetOfficeList error:\n", err)
+		log.Errorln("OFFICE: GetOfficeList error:", err)
 		return nil, err
 	}
 
@@ -28,6 +29,6 @@ func (s *CustomerService) GetOfficeList(ctx context.Context, in *pb.GetOfficeLis
 		})
 	}
 
-	log.Println("OFFICE: GetOfficeList:\n", result)
+	log.Infoln("OFFICE: GetOfficeList:", result)
 	return &pb.GetOfficeListResponse{Result: result}, nil
 }

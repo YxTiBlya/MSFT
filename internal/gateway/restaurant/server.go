@@ -3,9 +3,10 @@ package gateway_restaurant
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/MSFT/internal/cfg"
 	service "github.com/MSFT/internal/service/restaurant"
@@ -28,9 +29,9 @@ func (rs *RestaurantServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 		log.Fatalln("failed to listen:\n" + err.Error())
 	}
 
-	log.Printf("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
+	log.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
 	if err := s.Serve(l); err != nil {
-		panic("error service grpc server:\n" + err.Error())
+		log.Fatalln("error service grpc server:\n" + err.Error())
 	}
 }
 
@@ -39,19 +40,19 @@ func (rs *RestaurantServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config,
 	endpoint := fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port)
 
 	if err := pb.RegisterMenuServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	if err := pb.RegisterOrderServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	if err := pb.RegisterProductServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
-	log.Printf("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_http_service_port))
+	log.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_http_service_port))
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Restaurant_http_service_port), mux); err != nil {
-		log.Fatalf("error service http server %v", err)
+		log.Fatalln("error service http server:\n" + err.Error())
 	}
 }

@@ -3,14 +3,15 @@ package gateway
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/MSFT/internal/cfg"
 	"github.com/MSFT/internal/rabbitmq"
+	"github.com/MSFT/internal/store"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -20,6 +21,30 @@ type server interface {
 }
 
 func Run(cfg *cfg.Config, server server, recieve_broker bool) error {
+	// create the connection to db
+	if _, err := store.ConnToDB(cfg); err != nil {
+		panic("failed to connect database:\n" + err.Error())
+	}
+
+	// create the connection to rabbitmq
+	if err := rabbitmq.ConnToRabbitMQ(cfg); err != nil {
+		panic("failed to connect rabbitmq:\n" + err.Error())
+	}
+
+	// logger init
+	log.SetFormatter(&log.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
+	if cfg.Logging_in_file {
+		logger_file, err := os.OpenFile("logger/restaurant.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			panic("failed to create or opening the logger file:\n" + err.Error())
+		}
+		defer logger_file.Close()
+		log.SetOutput(logger_file)
+	}
+
+	// server init
 	s := grpc.NewServer()
 	mux := runtime.NewServeMux()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -42,7 +67,7 @@ func gracefulShutDown(s *grpc.Server, cancel context.CancelFunc) {
 
 	sig := <-ch
 	errorMessage := fmt.Sprintf("%s %v - %s", "Received shutdown signal:", sig, "Graceful shutdown done")
-	log.Println(errorMessage)
+	log.Errorln(errorMessage)
 	s.GracefulStop()
 	cancel()
 }

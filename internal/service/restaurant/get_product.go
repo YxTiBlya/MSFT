@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
@@ -15,7 +16,7 @@ func (s *RestaurantService) GetProduct(ctx context.Context, in *pb.GetProductLis
 	var result []*pb.Product
 
 	if err := store.DB.Model(&restaurant_models.Product{}).Find(&products).Error; err != nil {
-		log.Println("PRODUCT: GetProduct error:\n", err)
+		log.Errorln("PRODUCT: GetProduct error:", err)
 		return nil, err
 	}
 
@@ -31,6 +32,6 @@ func (s *RestaurantService) GetProduct(ctx context.Context, in *pb.GetProductLis
 		})
 	}
 
-	log.Println("PRODUCT: GetProduct:\n", result)
+	log.Infoln("PRODUCT: GetProduct:", result)
 	return &pb.GetProductListResponse{Result: result}, nil
 }

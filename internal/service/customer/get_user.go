@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	customer_models "github.com/MSFT/internal/models/customer"
 	"github.com/MSFT/internal/store"
@@ -15,7 +16,7 @@ func (s *CustomerService) GetUserList(ctx context.Context, in *pb.GetUserListReq
 	var result []*pb.User
 
 	if err := store.DB.Model(&customer_models.User{}).Where("office_uuid = ?", in.OfficeUuid).Find(&users).Error; err != nil {
-		log.Println("USER: GetUserList error:\n", err)
+		log.Errorln("USER: GetUserList error:", err)
 		return nil, err
 	}
 
@@ -29,6 +30,6 @@ func (s *CustomerService) GetUserList(ctx context.Context, in *pb.GetUserListReq
 		})
 	}
 
-	log.Println("USER: GetUserList:\n", in)
+	log.Infoln("USER: GetUserList:", in)
 	return &pb.GetUserListResponse{Result: result}, nil
 }

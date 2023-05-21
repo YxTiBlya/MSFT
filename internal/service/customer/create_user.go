@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	customer_models "github.com/MSFT/internal/models/customer"
 	"github.com/MSFT/internal/store"
@@ -23,10 +24,10 @@ func (s *CustomerService) CreateUser(ctx context.Context, in *pb.CreateUserReque
 	}
 
 	if err := store.DB.Model(&customer_models.User{}).Create(&user).Error; err != nil {
-		log.Println("USER: CreateUser error:\n", err)
+		log.Errorln("USER: CreateUser error:", err)
 		return nil, err
 	}
 
-	log.Println("USER: CreateUser:\n", in)
+	log.Infoln("USER: CreateUser:", in)
 	return &pb.CreateUserResponse{}, nil
 }

@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/MSFT/internal/cfg"
 	"github.com/MSFT/internal/rabbitmq"
@@ -23,7 +24,7 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 
 	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Println("ORDER: CreateOrder error:\n", err.Error())
+		log.Errorln("ORDER: CreateOrder error:", err.Error())
 		return nil, err
 	}
 	defer conn.Close()
@@ -31,7 +32,7 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 	client := restaurant.NewMenuServiceClient(conn)
 	response, err := client.GetMenu(context.Background(), &restaurant.GetMenuRequest{OnDate: timestamppb.Now()})
 	if err != nil {
-		log.Println("ORDER: CreateOrder error:\n", err.Error())
+		log.Errorln("ORDER: CreateOrder error:", err.Error())
 		return nil, err
 	}
 
@@ -53,13 +54,13 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 				Body:        msg,
 			},
 		); err != nil {
-			log.Println("error publish the order:\n", err.Error())
+			log.Errorln("error publish the order:", err.Error())
 		}
 
-		log.Println("ORDER: CreateOrder sended msg:\n", in)
+		log.Infoln("ORDER: CreateOrder sended msg:", in)
 		return &pb.CreateOrderResponse{}, nil
 	}
 
-	log.Println("ORDER: CreateOrder error:\n", errors.New("the time for orders has passed"))
+	log.Errorln("ORDER: CreateOrder error:\n", errors.New("the time for orders has passed"))
 	return nil, errors.New("the time for orders has passed")
 }
