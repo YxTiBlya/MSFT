@@ -1,15 +1,12 @@
 package rabbitmq
 
 import (
-	"encoding/json"
-
-	log "github.com/sirupsen/logrus"
+	"github.com/rabbitmq/amqp091-go"
 
 	"github.com/MSFT/internal/cfg"
-	"github.com/MSFT/pkg/services/customer"
 )
 
-func RecieveOrder(c *cfg.Config) {
+func RecieveOrder(c *cfg.Config) (<-chan amqp091.Delivery, error) {
 	q, err := Chann.QueueDeclare(
 		"",    // name
 		false, // durable
@@ -19,7 +16,7 @@ func RecieveOrder(c *cfg.Config) {
 		nil,   // arguments
 	)
 	if err != nil {
-		log.Fatalln("rabbitmq: error to declare queue:\n", err.Error())
+		return nil, err
 	}
 
 	err = Chann.QueueBind(
@@ -30,24 +27,13 @@ func RecieveOrder(c *cfg.Config) {
 		nil,
 	)
 	if err != nil {
-		log.Fatalln("rabbitmq: error to bind queue:\n", err.Error())
+		return nil, err
 	}
 
 	msgs, err := Chann.Consume(q.Name, "", true, false, false, false, nil)
 	if err != nil {
-		log.Fatalln("rabbitmq: error to consume init:\n", err.Error())
+		return nil, err
 	}
 
-	var forever chan struct{}
-	log.Infoln("starting listening order queue at rabbitmq")
-	go func() {
-		for d := range msgs {
-			log.Infof("recieved message: %s", d.Body)
-			data := customer.CreateOrderRequest{}
-			json.Unmarshal(d.Body, &data)
-			//log.Println(data)
-		}
-	}()
-
-	<-forever
+	return msgs, nil
 }
