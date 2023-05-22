@@ -5,10 +5,10 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
-	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
 )
 
@@ -30,16 +30,16 @@ func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) 
 
 	result := &pb.Menu{
 		Uuid:            menu.Uuid,
-		OnDate:          timestamp.ToTimestamppb(menu.OnDate),
-		OpeningRecordAt: timestamp.ToTimestamppb(menu.OpeningRecordAt),
-		ClosingRecordAt: timestamp.ToTimestamppb(menu.ClosingRecordAt),
+		OnDate:          &timestamppb.Timestamp{Seconds: menu.OnDate.Unix()},
+		OpeningRecordAt: &timestamppb.Timestamp{Seconds: menu.OpeningRecordAt.Unix()},
+		ClosingRecordAt: &timestamppb.Timestamp{Seconds: menu.ClosingRecordAt.Unix()},
 		Salads:          menu.Salads.ToGRPCModel(),
 		Garnishes:       menu.Garnishes.ToGRPCModel(),
 		Meats:           menu.Meats.ToGRPCModel(),
 		Soups:           menu.Soups.ToGRPCModel(),
 		Drinks:          menu.Drinks.ToGRPCModel(),
 		Desserts:        menu.Desserts.ToGRPCModel(),
-		CreatedAt:       timestamp.ToTimestamppb(menu.CreatedAt),
+		CreatedAt:       &timestamppb.Timestamp{Seconds: menu.CreatedAt.Unix()},
 	}
 
 	log.Infoln("MENU: GetMenu:", result)

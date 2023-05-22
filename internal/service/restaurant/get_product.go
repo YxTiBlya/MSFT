@@ -4,10 +4,10 @@ import (
 	"context"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
-	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
 )
 
@@ -28,7 +28,7 @@ func (s *RestaurantService) GetProduct(ctx context.Context, in *pb.GetProductLis
 			Type:        pb.ProductType(item.Type),
 			Weight:      item.Weight,
 			Price:       item.Price,
-			CreatedAt:   timestamp.ToTimestamppb(item.CreatedAt),
+			CreatedAt:   &timestamppb.Timestamp{Seconds: item.CreatedAt.Unix()},
 		})
 	}
 

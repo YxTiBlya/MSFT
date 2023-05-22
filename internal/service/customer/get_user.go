@@ -4,10 +4,10 @@ import (
 	"context"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	customer_models "github.com/MSFT/internal/models/customer"
 	"github.com/MSFT/internal/store"
-	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/customer"
 )
 
@@ -26,7 +26,7 @@ func (s *CustomerService) GetUserList(ctx context.Context, in *pb.GetUserListReq
 			Name:       item.Name,
 			OfficeUuid: item.Office_uuid,
 			OfficeName: item.Office_name,
-			CreatedAt:  timestamp.ToTimestamppb(item.CreatedAt),
+			CreatedAt:  &timestamppb.Timestamp{Seconds: item.CreatedAt.Unix()},
 		})
 	}
 
