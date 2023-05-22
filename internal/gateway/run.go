@@ -18,6 +18,7 @@ import (
 type server interface {
 	RunGRPCServer(*cfg.Config, *grpc.Server)
 	RuntHTTPServer(context.Context, *cfg.Config, *runtime.ServeMux)
+	RunRabbitMQReciever(c *cfg.Config)
 }
 
 func Run(cfg *cfg.Config, server server, recieve_broker bool) error {
@@ -52,7 +53,7 @@ func Run(cfg *cfg.Config, server server, recieve_broker bool) error {
 	go server.RunGRPCServer(cfg, s)
 	go server.RuntHTTPServer(ctx, cfg, mux)
 	if recieve_broker {
-		go rabbitmq.RecieveOrder(cfg)
+		go server.RunRabbitMQReciever(cfg)
 	}
 
 	gracefulShutDown(s, cancel)

@@ -2,14 +2,20 @@ package gateway_restaurant
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/MSFT/internal/cfg"
+	restaurant_models "github.com/MSFT/internal/models/restaurant"
+	"github.com/MSFT/internal/rabbitmq"
 	service "github.com/MSFT/internal/service/restaurant"
+	"github.com/MSFT/internal/store"
+	"github.com/MSFT/pkg/services/customer"
 	pb "github.com/MSFT/pkg/services/restaurant"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -55,4 +61,56 @@ func (rs *RestaurantServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config,
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Restaurant_http_service_port), mux); err != nil {
 		log.Fatalln("error service http server:\n" + err.Error())
 	}
+}
+
+func (rs *RestaurantServer) RunRabbitMQReciever(cfg *cfg.Config) {
+	msgs, err := rabbitmq.RecieveOrder(cfg)
+	if err != nil {
+		log.Fatalln("failed to recieve at rabbitmq:", err)
+	}
+
+	var forever chan struct{}
+	log.Infoln("starting listening order queue at rabbitmq")
+	go func() {
+		for d := range msgs {
+			log.Infof("recieved message: %s", d.Body)
+
+			orderRequest := customer.CreateOrderRequest{}
+			json.Unmarshal(d.Body, &orderRequest)
+
+			var orders restaurant_models.Orders
+			var findedOrder bool = true
+
+			nowTime := time.Now()
+			startTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, time.Local)
+			endTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 23, 59, 59, 0, time.Local)
+
+			if err := store.DB.Model(&restaurant_models.Orders{}).Where("created_at >= ? AND created_at <= ?", startTime, endTime).First(&orders).Error; err != nil {
+				log.Infoln("not found TotalOrders of today")
+				findedOrder = false
+			}
+
+			if err := service.UpdateOrderList(&orders, &orderRequest); err != nil {
+				log.Errorln("error to update total order list:", err)
+				continue
+			}
+
+			if findedOrder {
+				if err := store.DB.Model(&restaurant_models.Orders{}).Omit("created_at").Where("id = ?", orders.Id).Updates(&orders).Error; err != nil {
+					log.Errorln("failed to update order:", err)
+					continue
+				}
+			} else {
+				orders.CreatedAt = nowTime
+				if err := store.DB.Model(&restaurant_models.Orders{}).Create(&orders).Error; err != nil {
+					log.Errorln("failed to create order:", err)
+					continue
+				}
+			}
+
+			log.Infoln("updated total order:", orders)
+		}
+	}()
+
+	<-forever
 }

@@ -56,3 +56,7 @@ func (rs *CustomerServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config, m
 		log.Fatalln("error service http server:\n" + err.Error())
 	}
 }
+
+func (rs *CustomerServer) RunRabbitMQReciever(cfg *cfg.Config) {
+
+}
