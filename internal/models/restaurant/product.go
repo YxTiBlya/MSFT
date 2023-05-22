@@ -6,10 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/MSFT/internal/timestamp"
 	pb "github.com/MSFT/pkg/services/restaurant"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
 
@@ -48,7 +48,7 @@ func (p *Product) ToGRPCModel() *pb.Product {
 		Type:        pb.ProductType(p.Type),
 		Weight:      p.Weight,
 		Price:       p.Price,
-		CreatedAt:   timestamp.ToTimestamppb(p.CreatedAt),
+		CreatedAt:   &timestamppb.Timestamp{Seconds: p.CreatedAt.Unix()},
 	}
 }
 

@@ -4,13 +4,17 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 
+	pb "github.com/MSFT/pkg/services/restaurant"
 	"github.com/lib/pq"
 )
 
 type Orders struct {
-	TotalOrders          OrderArray         `gorm:"type:jsonb[]"`
-	TotalOrdersByCompany OrderByOfficeArray `gorm:"type:jsonb[]"`
+	Id                   uint               `gorm:"primary_key"`
+	TotalOrders          OrderArray         `gorm:"type:jsonb[];not null"`
+	TotalOrdersByCompany OrderByOfficeArray `gorm:"type:jsonb[];not null"`
+	CreatedAt            time.Time          `gorm:"type:timestamp without time zone;not null"`
 }
 
 func (o Orders) Value() (driver.Value, error) {
@@ -45,6 +49,14 @@ func (o *Order) Scan(src any) error {
 	return json.Unmarshal(source, &o)
 }
 
+func (o *Order) ToGRPCModel() *pb.Order {
+	return &pb.Order{
+		ProductId:   o.ProductUuid,
+		ProductName: o.ProductName,
+		Count:       o.Count,
+	}
+}
+
 type OrderArray []Order
 
 func (oa *OrderArray) Scan(src any) error {
@@ -53,6 +65,16 @@ func (oa *OrderArray) Scan(src any) error {
 
 func (oa OrderArray) Value() (driver.Value, error) {
 	return pq.GenericArray{A: oa}.Value()
+}
+
+func (oa OrderArray) ToGRPCModel() []*pb.Order {
+	var orders []*pb.Order
+
+	for _, order := range oa {
+		orders = append(orders, order.ToGRPCModel())
+	}
+
+	return orders
 }
 
 // -----
@@ -76,6 +98,15 @@ func (o *OrderByOffice) Scan(src any) error {
 	return json.Unmarshal(source, &o)
 }
 
+func (o *OrderByOffice) ToGRPCModel() *pb.OrdersByOffice {
+	return &pb.OrdersByOffice{
+		CompanyId:     o.CompanyUuid,
+		OfficeName:    o.OfficeName,
+		OfficeAddress: o.OfficeAddress,
+		Result:        o.Result.ToGRPCModel(),
+	}
+}
+
 type OrderByOfficeArray []OrderByOffice
 
 func (oboa *OrderByOfficeArray) Scan(src any) error {
@@ -84,4 +115,14 @@ func (oboa *OrderByOfficeArray) Scan(src any) error {
 
 func (oboa OrderByOfficeArray) Value() (driver.Value, error) {
 	return pq.GenericArray{A: oboa}.Value()
+}
+
+func (oboa OrderByOfficeArray) ToGRPCModel() []*pb.OrdersByOffice {
+	var orders []*pb.OrdersByOffice
+
+	for _, order := range oboa {
+		orders = append(orders, order.ToGRPCModel())
+	}
+
+	return orders
 }
