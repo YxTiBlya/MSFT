@@ -6,6 +6,7 @@ import (
 	"github.com/MSFT/internal/cfg"
 	customer_models "github.com/MSFT/internal/models/customer"
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
+	statistics_models "github.com/MSFT/internal/models/statistics"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -28,6 +29,8 @@ func ConnToDB(c *cfg.Config) (*gorm.DB, error) {
 
 		&customer_models.Office{},
 		&customer_models.User{},
+
+		&statistics_models.Statistics{},
 	)
 
 	return DB, nil
