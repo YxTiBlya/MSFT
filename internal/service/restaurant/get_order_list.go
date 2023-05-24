@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
@@ -19,7 +19,7 @@ func (s *RestaurantService) GetUpToDateOrderList(ctx context.Context, in *pb.Get
 	endTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 23, 59, 59, 0, time.Local)
 
 	if err := store.DB.Model(&restaurant_models.Orders{}).Where("created_at >= ? AND created_at <= ?", startTime, endTime).First(&orders).Error; err != nil {
-		log.Errorln("ORDER: GetUpToDateOrderList error:", err)
+		log.ContextLogger.Error("GetUpToDateOrderList error:", err)
 		return nil, err
 	}
 
@@ -27,6 +27,6 @@ func (s *RestaurantService) GetUpToDateOrderList(ctx context.Context, in *pb.Get
 		TotalOrders:          orders.TotalOrders.ToGRPCModel(),
 		TotalOrdersByCompany: orders.TotalOrdersByCompany.ToGRPCModel(),
 	}
-	log.Infoln("ORDER: GetUpToDateOrderList:", result)
+	log.ContextLogger.Info("GetUpToDateOrderList:", result)
 	return result, nil
 }

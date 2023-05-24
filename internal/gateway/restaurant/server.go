@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	"github.com/MSFT/internal/cfg"
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
@@ -32,12 +32,12 @@ func (rs *RestaurantServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 
 	l, err := net.Listen("tcp", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
 	if err != nil {
-		log.Fatalln("failed to listen:\n" + err.Error())
+		log.ContextLogger.Fatal("failed to listen:", err.Error())
 	}
 
-	log.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
+	log.ContextLogger.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
 	if err := s.Serve(l); err != nil {
-		log.Fatalln("error service grpc server:\n" + err.Error())
+		log.ContextLogger.Fatal("error service grpc server:", err.Error())
 	}
 }
 
@@ -46,34 +46,34 @@ func (rs *RestaurantServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config,
 	endpoint := fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port)
 
 	if err := pb.RegisterMenuServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatalln(err)
+		log.ContextLogger.Fatal(err)
 	}
 
 	if err := pb.RegisterOrderServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatalln(err)
+		log.ContextLogger.Fatal(err)
 	}
 
 	if err := pb.RegisterProductServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatalln(err)
+		log.ContextLogger.Fatal(err)
 	}
 
-	log.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_http_service_port))
+	log.ContextLogger.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_http_service_port))
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Restaurant_http_service_port), mux); err != nil {
-		log.Fatalln("error service http server:\n" + err.Error())
+		log.ContextLogger.Fatal("error service http server:", err.Error())
 	}
 }
 
 func (rs *RestaurantServer) RunRabbitMQReciever(cfg *cfg.Config) {
 	msgs, err := rabbitmq.RecieveOrder(cfg)
 	if err != nil {
-		log.Fatalln("failed to recieve at rabbitmq:", err)
+		log.ContextLogger.Fatalln("failed to recieve at rabbitmq:", err)
 	}
 
 	var forever chan struct{}
-	log.Infoln("starting listening order queue at rabbitmq")
+	log.ContextLogger.Infoln("starting listening order queue at rabbitmq")
 	go func() {
 		for d := range msgs {
-			log.Infof("recieved message: %s", d.Body)
+			log.ContextLogger.Infof("recieved message: %s", d.Body)
 
 			orderRequest := customer.CreateOrderRequest{}
 			json.Unmarshal(d.Body, &orderRequest)
@@ -86,29 +86,29 @@ func (rs *RestaurantServer) RunRabbitMQReciever(cfg *cfg.Config) {
 			endTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 23, 59, 59, 0, time.Local)
 
 			if err := store.DB.Model(&restaurant_models.Orders{}).Where("created_at >= ? AND created_at <= ?", startTime, endTime).First(&orders).Error; err != nil {
-				log.Infoln("not found TotalOrders of today")
+				log.ContextLogger.Infoln("not found TotalOrders of today")
 				findedOrder = false
 			}
 
 			if err := service.UpdateOrderList(&orders, &orderRequest); err != nil {
-				log.Errorln("error to update total order list:", err)
+				log.ContextLogger.Errorln("error to update total order list:", err)
 				continue
 			}
 
 			if findedOrder {
 				if err := store.DB.Model(&restaurant_models.Orders{}).Omit("created_at").Where("id = ?", orders.Id).Updates(&orders).Error; err != nil {
-					log.Errorln("failed to update order:", err)
+					log.ContextLogger.Errorln("failed to update order:", err)
 					continue
 				}
 			} else {
 				orders.CreatedAt = nowTime
 				if err := store.DB.Model(&restaurant_models.Orders{}).Create(&orders).Error; err != nil {
-					log.Errorln("failed to create order:", err)
+					log.ContextLogger.Errorln("failed to create order:", err)
 					continue
 				}
 			}
 
-			log.Infoln("updated total order:", orders)
+			log.ContextLogger.Infoln("updated total order:", orders)
 		}
 	}()
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	customer_models "github.com/MSFT/internal/models/customer"
 	"github.com/MSFT/internal/store"
@@ -19,10 +19,10 @@ func (s *CustomerService) CreateOffice(ctx context.Context, in *pb.CreateOfficeR
 	}
 
 	if err := store.DB.Model(&customer_models.Office{}).Create(&office).Error; err != nil {
-		log.Errorln("OFFICE: CreateOffice error:", err)
+		log.ContextLogger.Error("CreateOffice error:", err)
 		return nil, err
 	}
 
-	log.Infoln("OFFICE: CreateOffice:", in)
+	log.ContextLogger.Info("CreateOffice:", in)
 	return &pb.CreateOfficeResponse{}, nil
 }

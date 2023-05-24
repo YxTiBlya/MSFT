@@ -5,10 +5,10 @@ import (
 	"sort"
 	"time"
 
+	log "github.com/MSFT/internal/log"
 	statistics_models "github.com/MSFT/internal/models/statistics"
 	"github.com/MSFT/internal/store"
 	pb "github.com/MSFT/pkg/services/statistics"
-	log "github.com/sirupsen/logrus"
 )
 
 func (s *StatisticsService) TopProducts(ctx context.Context, in *pb.TopProductsRequest) (*pb.TopProductsResponse, error) {
@@ -18,7 +18,7 @@ func (s *StatisticsService) TopProducts(ctx context.Context, in *pb.TopProductsR
 	endDate := time.Unix(in.EndDate.Seconds, int64(in.EndDate.Nanos))
 
 	if err := store.DB.Model(&statistics_models.Statistics{}).Where("created_at >= ? AND created_at <= ?", startDate, endDate).Find(&statistics).Error; err != nil {
-		log.Errorln("STATISTICS: TopProducts error:", err)
+		log.ContextLogger.Error("TopProducts error:", err)
 		return nil, err
 	}
 
@@ -31,6 +31,6 @@ func (s *StatisticsService) TopProducts(ctx context.Context, in *pb.TopProductsR
 		return result[i].Count > result[j].Count
 	})
 
-	log.Infoln("STATISTICS: TopProducts:", result)
+	log.ContextLogger.Info("TopProducts:", result)
 	return &pb.TopProductsResponse{Result: result}, nil
 }

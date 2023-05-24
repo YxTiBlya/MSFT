@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	"github.com/MSFT/internal/cfg"
 	service "github.com/MSFT/internal/service/customer"
@@ -26,12 +26,12 @@ func (rs *CustomerServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 
 	l, err := net.Listen("tcp", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Customer_grpc_service_port))
 	if err != nil {
-		log.Fatalln("failed to listen:\n" + err.Error())
+		log.ContextLogger.Fatal("failed to listen:", err.Error())
 	}
 
-	log.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Customer_grpc_service_port))
+	log.ContextLogger.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Customer_grpc_service_port))
 	if err := s.Serve(l); err != nil {
-		log.Fatalln("error service grpc server:\n" + err.Error())
+		log.ContextLogger.Fatal("error service grpc server:", err.Error())
 	}
 }
 
@@ -40,20 +40,20 @@ func (rs *CustomerServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config, m
 	endpoint := fmt.Sprintf("%v:%d", cfg.General_host, cfg.Customer_grpc_service_port)
 
 	if err := pb.RegisterOfficeServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatalln(err)
+		log.ContextLogger.Fatal(err)
 	}
 
 	if err := pb.RegisterOrderServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatalln(err)
+		log.ContextLogger.Fatal(err)
 	}
 
 	if err := pb.RegisterUserServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
-		log.Fatalln(err)
+		log.ContextLogger.Fatal(err)
 	}
 
-	log.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Customer_http_service_port))
+	log.ContextLogger.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Customer_http_service_port))
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Customer_http_service_port), mux); err != nil {
-		log.Fatalln("error service http server:\n" + err.Error())
+		log.ContextLogger.Fatal("error service http server:", err.Error())
 	}
 }
 

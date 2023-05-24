@@ -1,11 +1,11 @@
 package service
 
 import (
+	log "github.com/MSFT/internal/log"
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	statistics_models "github.com/MSFT/internal/models/statistics"
 	"github.com/MSFT/internal/store"
 	"github.com/MSFT/pkg/services/customer"
-	log "github.com/sirupsen/logrus"
 )
 
 func UpdateStatisticsList(statistics *statistics_models.Statistics, orderRequest *customer.CreateOrderRequest) error {
@@ -23,7 +23,7 @@ func updateStatistics(statistics *statistics_models.Statistics, order []*custome
 	var product restaurant_models.Product
 	for _, orderItem := range order {
 		if err := store.DB.Model(&restaurant_models.Product{}).Where("uuid = ?", orderItem.ProductUuid).First(&product).Error; err != nil {
-			log.Errorln("product not finded:", err)
+			log.ContextLogger.Error("product not finded:", err)
 			continue
 		}
 		statistics.Profit += float64(orderItem.Count) * product.Price

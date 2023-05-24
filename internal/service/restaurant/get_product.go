@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
@@ -16,7 +16,7 @@ func (s *RestaurantService) GetProduct(ctx context.Context, in *pb.GetProductLis
 	var result []*pb.Product
 
 	if err := store.DB.Model(&restaurant_models.Product{}).Find(&products).Error; err != nil {
-		log.Errorln("PRODUCT: GetProduct error:", err)
+		log.ContextLogger.Error("GetProduct error:", err)
 		return nil, err
 	}
 
@@ -32,6 +32,6 @@ func (s *RestaurantService) GetProduct(ctx context.Context, in *pb.GetProductLis
 		})
 	}
 
-	log.Infoln("PRODUCT: GetProduct:", result)
+	log.ContextLogger.Info("GetProduct:", result)
 	return &pb.GetProductListResponse{Result: result}, nil
 }

@@ -1,11 +1,11 @@
 package service
 
 import (
+	log "github.com/MSFT/internal/log"
 	customer_models "github.com/MSFT/internal/models/customer"
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
 	"github.com/MSFT/pkg/services/customer"
-	log "github.com/sirupsen/logrus"
 )
 
 func UpdateOrderList(orders *restaurant_models.Orders, orderRequest *customer.CreateOrderRequest) error {
@@ -33,7 +33,7 @@ func appendOrder(orders *restaurant_models.Orders, orderOffice customer_models.O
 	var product restaurant_models.Product
 	for _, orderItem := range order {
 		if err := store.DB.Model(&restaurant_models.Product{}).Where("uuid = ?", orderItem.ProductUuid).First(&product).Error; err != nil {
-			log.Errorln("product not finded:", err)
+			log.ContextLogger.Error("product not finded:", err)
 			continue
 		}
 

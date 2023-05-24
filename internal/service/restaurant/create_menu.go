@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	restaurant_models "github.com/MSFT/internal/models/restaurant"
 	"github.com/MSFT/internal/store"
@@ -35,10 +35,10 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 	}
 
 	if err := store.DB.Model(&restaurant_models.Menu{}).Create(&menu).Error; err != nil {
-		log.Errorln("MENU: CreateMenu error:", err)
+		log.ContextLogger.Error("CreateMenu error:", err)
 		return nil, err
 	}
 
-	log.Infoln("MENU: CreateMenu:", in)
+	log.ContextLogger.Info("CreateMenu:", in)
 	return &pb.CreateMenuResponse{}, nil
 }

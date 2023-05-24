@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	customer_models "github.com/MSFT/internal/models/customer"
@@ -16,7 +16,7 @@ func (s *CustomerService) GetUserList(ctx context.Context, in *pb.GetUserListReq
 	var result []*pb.User
 
 	if err := store.DB.Model(&customer_models.User{}).Where("office_uuid = ?", in.OfficeUuid).Find(&users).Error; err != nil {
-		log.Errorln("USER: GetUserList error:", err)
+		log.ContextLogger.Error("GetUserList error:", err)
 		return nil, err
 	}
 
@@ -30,6 +30,6 @@ func (s *CustomerService) GetUserList(ctx context.Context, in *pb.GetUserListReq
 		})
 	}
 
-	log.Infoln("USER: GetUserList:", in)
+	log.ContextLogger.Info("GetUserList:", in)
 	return &pb.GetUserListResponse{Result: result}, nil
 }

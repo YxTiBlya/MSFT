@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	"github.com/MSFT/internal/cfg"
 	"github.com/MSFT/internal/rabbitmq"
@@ -24,7 +24,7 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 
 	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Errorln("ORDER: CreateOrder error:", err.Error())
+		log.ContextLogger.Error("CreateOrder error:", err.Error())
 		return nil, err
 	}
 	defer conn.Close()
@@ -32,7 +32,7 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 	client := restaurant.NewMenuServiceClient(conn)
 	response, err := client.GetMenu(context.Background(), &restaurant.GetMenuRequest{OnDate: timestamppb.Now()})
 	if err != nil {
-		log.Errorln("ORDER: CreateOrder error:", err.Error())
+		log.ContextLogger.Error("CreateOrder error:", err.Error())
 		return nil, err
 	}
 
@@ -54,13 +54,13 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 				Body:        msg,
 			},
 		); err != nil {
-			log.Errorln("error publish the order:", err.Error())
+			log.ContextLogger.Error("error publish the order:", err.Error())
 		}
 
-		log.Infoln("ORDER: CreateOrder sended msg:", in)
+		log.ContextLogger.Info("CreateOrder sended msg:", in)
 		return &pb.CreateOrderResponse{}, nil
 	}
 
-	log.Errorln("ORDER: CreateOrder error:\n", errors.New("the time for orders has passed"))
+	log.ContextLogger.Error("CreateOrder error: the time for orders has passed")
 	return nil, errors.New("the time for orders has passed")
 }

@@ -1,6 +1,7 @@
 package cfg
 
 type Config struct {
+	Current_service string
 	General_host    string
 	Logging_in_file bool
 
@@ -23,9 +24,6 @@ type Config struct {
 	Postgres_port     int32
 	Postgres_ssl      string
 	Postgres_dbname   string
-	// Postgres_restaurant_dbname string
-	// Postgres_consumer_dbname   string
-	// Postgres_statistics_dbname string
 }
 
 var config *Config

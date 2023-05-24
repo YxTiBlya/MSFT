@@ -13,6 +13,7 @@ func main() {
 	if _, err := toml.DecodeFile("config.toml", config); err != nil {
 		panic("failed to decode toml file:\n" + err.Error())
 	}
+	config.Current_service = "customer"
 	cfg.UpdateConfig(config)
 
 	// serve

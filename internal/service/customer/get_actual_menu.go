@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/MSFT/internal/log"
 
 	"github.com/MSFT/internal/cfg"
 	pb "github.com/MSFT/pkg/services/customer"
@@ -19,7 +19,7 @@ func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMen
 
 	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Errorln("ORDER: GetActualMenu error:", err.Error())
+		log.ContextLogger.Error("GetActualMenu error:", err.Error())
 		return nil, err
 	}
 	defer conn.Close()
@@ -27,7 +27,7 @@ func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMen
 	client := restaurant.NewMenuServiceClient(conn)
 	response, err := client.GetMenu(context.Background(), &restaurant.GetMenuRequest{OnDate: timestamppb.Now()})
 	if err != nil {
-		log.Errorln("ORDER: GetActualMenu error:", err.Error())
+		log.ContextLogger.Error("GetActualMenu error:", err.Error())
 		return nil, err
 	}
 
@@ -40,7 +40,7 @@ func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMen
 		Desserts:  toCustomerProduct(response.Menu.Desserts),
 	}
 
-	log.Infoln("ORDER: GetActualMenu:", actualMenu)
+	log.ContextLogger.Info("GetActualMenu:", actualMenu)
 	return actualMenu, nil
 }
 
