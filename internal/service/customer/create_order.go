@@ -22,7 +22,7 @@ import (
 func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	config := cfg.GetConfig()
 
-	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.Restaurant_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.ContextLogger.Error("CreateOrder error:", err.Error())
 		return nil, err
