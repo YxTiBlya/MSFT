@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    container_name: database
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/pgdata
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: ${postgres_username}
+      POSTGRES_PASSWORD: ${postgres_password}
+      POSTGRES_DB: ${postgres_dbname}
+    ports:
+      - ${postgres_port}:${postgres_port}
+    restart: always
+
+  rmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    ports:
+    - ${rabbitmq_port}:${rabbitmq_port}
+    restart: always
+
+  restaurant:
+    build:
+      dockerfile: Dockerfile.restaurant
+    container_name: restaurant-service
+    volumes:
+      - ./logger/restaurant.log:/restaurant/logger/restaurant.log
+    ports:
+      - ${restaurant_http_service_port}:${restaurant_http_service_port}
+      - ${restaurant_grpc_service_port}:${restaurant_grpc_service_port}
+    depends_on:
+      - db
+      - rmq
+    restart: always
+  
+  customer:
+    build:
+      dockerfile: Dockerfile.customer
+    container_name: customer-service
+    volumes:
+      - ./logger/customer.log:/customer/logger/customer.log
+    ports:
+      - ${customer_http_service_port}:${customer_http_service_port}
+      - ${customer_grpc_service_port}:${customer_grpc_service_port}
+    depends_on:
+      - db
+      - rmq
+    restart: always
+  
+  statistics:
+    build:
+      dockerfile: Dockerfile.statistics
+    container_name: statistics-service
+    volumes:
+      - ./logger/statistics.log:/statistics/logger/statistics.log
+    ports:
+      - ${statistics_http_service_port}:${statistics_http_service_port}
+      - ${statistics_grpc_service_port}:${statistics_grpc_service_port}
+    depends_on:
+      - db
+      - rmq
+    restart: always

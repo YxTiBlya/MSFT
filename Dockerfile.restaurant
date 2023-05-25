@@ -1,0 +1,25 @@
+FROM golang:latest
+
+WORKDIR /restaurant
+
+COPY cmd/restaurant cmd/restaurant/
+
+COPY internal/cfg internal/cfg/
+COPY internal/gateway/run.go internal/gateway/
+COPY internal/gateway/restaurant internal/gateway/restaurant/
+COPY internal/log internal/log/
+COPY internal/models internal/models/
+COPY internal/rabbitmq internal/rabbitmq/
+COPY internal/service/restaurant internal/service/restaurant/
+COPY internal/store internal/store/
+
+COPY logger/restaurant.log logger/restaurant.log
+COPY pkg pkg/
+COPY config.toml config.toml
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+RUN go mod download
+RUN go build cmd/restaurant/main.go
+
+CMD [ "./main" ]

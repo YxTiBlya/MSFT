@@ -1,0 +1,25 @@
+FROM golang:latest
+
+WORKDIR /statistics
+
+COPY cmd/statistics cmd/statistics/
+
+COPY internal/cfg internal/cfg/
+COPY internal/gateway/run.go internal/gateway/
+COPY internal/gateway/statistics internal/gateway/statistics/
+COPY internal/log internal/log/
+COPY internal/models internal/models/
+COPY internal/rabbitmq internal/rabbitmq/
+COPY internal/service/statistics internal/service/statistics/
+COPY internal/store internal/store/
+
+COPY logger/statistics.log logger/statistics.log
+COPY pkg pkg/
+COPY config.toml config.toml
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+RUN go mod download
+RUN go build cmd/statistics/main.go
+
+CMD [ "./main" ]

@@ -1,0 +1,25 @@
+FROM golang:latest
+
+WORKDIR /customer
+
+COPY cmd/customer cmd/customer/
+
+COPY internal/cfg internal/cfg/
+COPY internal/gateway/run.go internal/gateway/
+COPY internal/gateway/customer internal/gateway/customer/
+COPY internal/log internal/log/
+COPY internal/models internal/models/
+COPY internal/rabbitmq internal/rabbitmq/
+COPY internal/service/customer internal/service/customer/
+COPY internal/store internal/store/
+
+COPY logger/customer.log logger/customer.log
+COPY pkg pkg/
+COPY config.toml config.toml
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+RUN go mod download
+RUN go build cmd/customer/main.go
+
+CMD [ "./main" ]
