@@ -15,8 +15,8 @@ func (s *RestaurantService) GetUpToDateOrderList(ctx context.Context, in *pb.Get
 	var orders restaurant_models.Orders
 
 	nowTime := time.Now()
-	startTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, time.Local)
-	endTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 23, 59, 59, 0, time.Local)
+	startTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day()-1, 0, 0, 0, 0, time.Local)
+	endTime := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day()-1, 23, 59, 59, 0, time.Local)
 
 	if err := store.DB.Model(&restaurant_models.Orders{}).Where("created_at >= ? AND created_at <= ?", startTime, endTime).First(&orders).Error; err != nil {
 		log.ContextLogger.Error("GetUpToDateOrderList error:", err)
