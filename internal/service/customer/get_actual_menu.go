@@ -17,7 +17,7 @@ import (
 func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMenuRequest) (*pb.GetActualMenuResponse, error) {
 	config := cfg.GetConfig()
 
-	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.General_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(fmt.Sprintf("%v:%d", config.Restaurant_host, config.Restaurant_grpc_service_port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.ContextLogger.Error("GetActualMenu error:", err.Error())
 		return nil, err
