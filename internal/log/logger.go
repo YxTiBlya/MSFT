@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/MSFT/internal/cfg"
@@ -19,12 +20,10 @@ func InitLogger(cfg *cfg.Config) {
 		"service": cfg.Current_service,
 	})
 
-	if cfg.Logging_in_file {
-		logger_file, err := os.OpenFile(fmt.Sprintf("logger/%v.log", cfg.Current_service), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			panic("failed to create or opening the logger file:\n" + err.Error())
-		}
-		defer logger_file.Close()
-		log.SetOutput(logger_file)
+	logger_file, err := os.OpenFile(fmt.Sprintf("logger/%v.log", cfg.Current_service), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic("failed to create or opening the logger file:\n" + err.Error())
 	}
+
+	log.SetOutput(io.MultiWriter(os.Stdout, logger_file))
 }
