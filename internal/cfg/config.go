@@ -2,17 +2,18 @@ package cfg
 
 type Config struct {
 	Current_service string
-	General_host    string
-	Logging_in_file bool
 
 	Restaurant_grpc_service_port int32
 	Restaurant_http_service_port int32
+	Restaurant_host              string
 
 	Customer_grpc_service_port int32
 	Customer_http_service_port int32
+	Customer_host              string
 
 	Statistics_grpc_service_port int32
 	Statistics_http_service_port int32
+	Statistics_host              string
 
 	Rabbitmq_host       string
 	Rabbitmq_port       int32
