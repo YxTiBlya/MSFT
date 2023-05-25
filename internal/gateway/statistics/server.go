@@ -28,12 +28,12 @@ func (ss *StatisticsServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 	service := &service.StatisticsService{}
 	pb.RegisterStatisticsServiceServer(s, service)
 
-	l, err := net.Listen("tcp", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Statistics_grpc_service_port))
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Statistics_grpc_service_port))
 	if err != nil {
 		log.ContextLogger.Fatal("failed to listen:", err.Error())
 	}
 
-	log.ContextLogger.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Statistics_grpc_service_port))
+	log.ContextLogger.Infof("starting listening grpc server at %v", l.Addr())
 	if err := s.Serve(l); err != nil {
 		log.ContextLogger.Fatal("error service grpc server:", err.Error())
 	}
@@ -41,13 +41,13 @@ func (ss *StatisticsServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 
 func (ss *StatisticsServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config, mux *runtime.ServeMux) {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	endpoint := fmt.Sprintf("%v:%d", cfg.General_host, cfg.Statistics_grpc_service_port)
+	endpoint := fmt.Sprintf("localhost:%d", cfg.Statistics_grpc_service_port)
 
 	if err := pb.RegisterStatisticsServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
 		log.ContextLogger.Fatal(err)
 	}
 
-	log.ContextLogger.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Statistics_http_service_port))
+	log.ContextLogger.Infof("starting listening http server at %s", fmt.Sprintf("localhost:%d", cfg.Statistics_http_service_port))
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Statistics_http_service_port), mux); err != nil {
 		log.ContextLogger.Fatal("error service http server:", err.Error())
 	}

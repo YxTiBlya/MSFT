@@ -30,12 +30,12 @@ func (rs *RestaurantServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 	pb.RegisterOrderServiceServer(s, service)
 	pb.RegisterProductServiceServer(s, service)
 
-	l, err := net.Listen("tcp", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Restaurant_grpc_service_port))
 	if err != nil {
 		log.ContextLogger.Fatal("failed to listen:", err.Error())
 	}
 
-	log.ContextLogger.Infof("starting listening grpc server at %v", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port))
+	log.ContextLogger.Infof("starting listening grpc server at %v", l.Addr())
 	if err := s.Serve(l); err != nil {
 		log.ContextLogger.Fatal("error service grpc server:", err.Error())
 	}
@@ -43,7 +43,7 @@ func (rs *RestaurantServer) RunGRPCServer(cfg *cfg.Config, s *grpc.Server) {
 
 func (rs *RestaurantServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config, mux *runtime.ServeMux) {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	endpoint := fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_grpc_service_port)
+	endpoint := fmt.Sprintf("localhost:%d", cfg.Restaurant_grpc_service_port)
 
 	if err := pb.RegisterMenuServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
 		log.ContextLogger.Fatal(err)
@@ -57,8 +57,8 @@ func (rs *RestaurantServer) RuntHTTPServer(ctx context.Context, cfg *cfg.Config,
 		log.ContextLogger.Fatal(err)
 	}
 
-	log.ContextLogger.Infof("starting listening http server at %s", fmt.Sprintf("%v:%d", cfg.General_host, cfg.Restaurant_http_service_port))
-	if err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Restaurant_http_service_port), mux); err != nil {
+	log.ContextLogger.Infof("starting listening http server at %s", fmt.Sprintf("localhost:%d", cfg.Restaurant_http_service_port))
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Restaurant_http_service_port), mux); err != nil {
 		log.ContextLogger.Fatal("error service http server:", err.Error())
 	}
 }
