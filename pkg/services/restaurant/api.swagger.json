@@ -156,6 +156,36 @@
           "ProductService"
         ]
       }
+    },
+    "/restaurant/products/uuid": {
+      "get": {
+        "operationId": "ProductService_GetProductByUUID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/restaurantGetProductByUUIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "product_uuid",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -271,6 +301,14 @@
       "required": [
         "menu"
       ]
+    },
+    "restaurantGetProductByUUIDResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/restaurantProduct"
+        }
+      }
     },
     "restaurantGetProductListResponse": {
       "type": "object",

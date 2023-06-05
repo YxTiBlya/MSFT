@@ -24,12 +24,13 @@ service OrderService {
   
 message CreateOrderRequest {
     string user_uuid = 1 [(google.api.field_behavior) = REQUIRED];
-    repeated OrderItem salads = 2;
-    repeated OrderItem garnishes =  3;
-    repeated OrderItem meats = 4;
-    repeated OrderItem soups = 5;
-    repeated OrderItem drinks = 6;
-    repeated OrderItem desserts = 7;
+    string office_uuid = 2 [(google.api.field_behavior) = REQUIRED];
+    repeated OrderItem salads = 3;
+    repeated OrderItem garnishes =  4;
+    repeated OrderItem meats = 5;
+    repeated OrderItem soups = 6;
+    repeated OrderItem drinks = 7;
+    repeated OrderItem desserts = 8;
 }
   
 message CreateOrderResponse {}

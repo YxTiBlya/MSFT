@@ -74,6 +74,36 @@
         ]
       }
     },
+    "/customer/offices/uuid": {
+      "get": {
+        "operationId": "OfficeService_GetOfficeByUUID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/customerGetOfficeByUUIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "office_uuid",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OfficeService"
+        ]
+      }
+    },
     "/customer/users": {
       "get": {
         "operationId": "UserService_GetUserList",
@@ -185,6 +215,36 @@
           "OrderService"
         ]
       }
+    },
+    "/customer/users/uuid": {
+      "get": {
+        "operationId": "UserService_GetUserByUUID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/customerGetUserByUUIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_uuid",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -210,6 +270,9 @@
       "type": "object",
       "properties": {
         "user_uuid": {
+          "type": "string"
+        },
+        "office_uuid": {
           "type": "string"
         },
         "salads": {
@@ -256,7 +319,8 @@
         }
       },
       "required": [
-        "user_uuid"
+        "user_uuid",
+        "office_uuid"
       ]
     },
     "customerCreateOrderResponse": {
@@ -340,6 +404,14 @@
         }
       }
     },
+    "customerGetOfficeByUUIDResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/customerOffice"
+        }
+      }
+    },
     "customerGetOfficeListResponse": {
       "type": "object",
       "properties": {
@@ -349,6 +421,14 @@
             "type": "object",
             "$ref": "#/definitions/customerOffice"
           }
+        }
+      }
+    },
+    "customerGetUserByUUIDResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/customerUser"
         }
       }
     },

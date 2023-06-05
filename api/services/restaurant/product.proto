@@ -20,6 +20,12 @@ service ProductService {
             get: "/restaurant/products"
         };
     }
+
+    rpc GetProductByUUID(GetProductByUUIDRequest) returns (GetProductByUUIDResponse) {
+        option (google.api.http) = {
+            get: "/restaurant/products/uuid"
+        };
+    }
 }
 
 message CreateProductRequest {
@@ -36,6 +42,14 @@ message GetProductListRequest {}
 
 message GetProductListResponse {
     repeated Product result = 1;
+}
+
+message GetProductByUUIDRequest {
+    string product_uuid = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetProductByUUIDResponse {
+    Product result = 1;
 }
 
 message Product {

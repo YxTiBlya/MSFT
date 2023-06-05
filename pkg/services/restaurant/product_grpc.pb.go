@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ProductService_CreateProduct_FullMethodName = "/restaurant.ProductService/CreateProduct"
-	ProductService_GetProduct_FullMethodName    = "/restaurant.ProductService/GetProduct"
+	ProductService_CreateProduct_FullMethodName    = "/restaurant.ProductService/CreateProduct"
+	ProductService_GetProduct_FullMethodName       = "/restaurant.ProductService/GetProduct"
+	ProductService_GetProductByUUID_FullMethodName = "/restaurant.ProductService/GetProductByUUID"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -29,6 +30,7 @@ const (
 type ProductServiceClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*CreateProductResponse, error)
 	GetProduct(ctx context.Context, in *GetProductListRequest, opts ...grpc.CallOption) (*GetProductListResponse, error)
+	GetProductByUUID(ctx context.Context, in *GetProductByUUIDRequest, opts ...grpc.CallOption) (*GetProductByUUIDResponse, error)
 }
 
 type productServiceClient struct {
@@ -57,12 +59,22 @@ func (c *productServiceClient) GetProduct(ctx context.Context, in *GetProductLis
 	return out, nil
 }
 
+func (c *productServiceClient) GetProductByUUID(ctx context.Context, in *GetProductByUUIDRequest, opts ...grpc.CallOption) (*GetProductByUUIDResponse, error) {
+	out := new(GetProductByUUIDResponse)
+	err := c.cc.Invoke(ctx, ProductService_GetProductByUUID_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*CreateProductResponse, error)
 	GetProduct(context.Context, *GetProductListRequest) (*GetProductListResponse, error)
+	GetProductByUUID(context.Context, *GetProductByUUIDRequest) (*GetProductByUUIDResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -75,6 +87,9 @@ func (UnimplementedProductServiceServer) CreateProduct(context.Context, *CreateP
 }
 func (UnimplementedProductServiceServer) GetProduct(context.Context, *GetProductListRequest) (*GetProductListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProduct not implemented")
+}
+func (UnimplementedProductServiceServer) GetProductByUUID(context.Context, *GetProductByUUIDRequest) (*GetProductByUUIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductByUUID not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
@@ -125,6 +140,24 @@ func _ProductService_GetProduct_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_GetProductByUUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductByUUIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetProductByUUID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_GetProductByUUID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetProductByUUID(ctx, req.(*GetProductByUUIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +172,10 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProduct",
 			Handler:    _ProductService_GetProduct_Handler,
+		},
+		{
+			MethodName: "GetProductByUUID",
+			Handler:    _ProductService_GetProductByUUID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

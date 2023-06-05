@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	OfficeService_CreateOffice_FullMethodName  = "/customer.OfficeService/CreateOffice"
-	OfficeService_GetOfficeList_FullMethodName = "/customer.OfficeService/GetOfficeList"
+	OfficeService_CreateOffice_FullMethodName    = "/customer.OfficeService/CreateOffice"
+	OfficeService_GetOfficeList_FullMethodName   = "/customer.OfficeService/GetOfficeList"
+	OfficeService_GetOfficeByUUID_FullMethodName = "/customer.OfficeService/GetOfficeByUUID"
 )
 
 // OfficeServiceClient is the client API for OfficeService service.
@@ -29,6 +30,7 @@ const (
 type OfficeServiceClient interface {
 	CreateOffice(ctx context.Context, in *CreateOfficeRequest, opts ...grpc.CallOption) (*CreateOfficeResponse, error)
 	GetOfficeList(ctx context.Context, in *GetOfficeListRequest, opts ...grpc.CallOption) (*GetOfficeListResponse, error)
+	GetOfficeByUUID(ctx context.Context, in *GetOfficeByUUIDRequest, opts ...grpc.CallOption) (*GetOfficeByUUIDResponse, error)
 }
 
 type officeServiceClient struct {
@@ -57,12 +59,22 @@ func (c *officeServiceClient) GetOfficeList(ctx context.Context, in *GetOfficeLi
 	return out, nil
 }
 
+func (c *officeServiceClient) GetOfficeByUUID(ctx context.Context, in *GetOfficeByUUIDRequest, opts ...grpc.CallOption) (*GetOfficeByUUIDResponse, error) {
+	out := new(GetOfficeByUUIDResponse)
+	err := c.cc.Invoke(ctx, OfficeService_GetOfficeByUUID_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OfficeServiceServer is the server API for OfficeService service.
 // All implementations must embed UnimplementedOfficeServiceServer
 // for forward compatibility
 type OfficeServiceServer interface {
 	CreateOffice(context.Context, *CreateOfficeRequest) (*CreateOfficeResponse, error)
 	GetOfficeList(context.Context, *GetOfficeListRequest) (*GetOfficeListResponse, error)
+	GetOfficeByUUID(context.Context, *GetOfficeByUUIDRequest) (*GetOfficeByUUIDResponse, error)
 	mustEmbedUnimplementedOfficeServiceServer()
 }
 
@@ -75,6 +87,9 @@ func (UnimplementedOfficeServiceServer) CreateOffice(context.Context, *CreateOff
 }
 func (UnimplementedOfficeServiceServer) GetOfficeList(context.Context, *GetOfficeListRequest) (*GetOfficeListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOfficeList not implemented")
+}
+func (UnimplementedOfficeServiceServer) GetOfficeByUUID(context.Context, *GetOfficeByUUIDRequest) (*GetOfficeByUUIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOfficeByUUID not implemented")
 }
 func (UnimplementedOfficeServiceServer) mustEmbedUnimplementedOfficeServiceServer() {}
 
@@ -125,6 +140,24 @@ func _OfficeService_GetOfficeList_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OfficeService_GetOfficeByUUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOfficeByUUIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OfficeServiceServer).GetOfficeByUUID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OfficeService_GetOfficeByUUID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OfficeServiceServer).GetOfficeByUUID(ctx, req.(*GetOfficeByUUIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OfficeService_ServiceDesc is the grpc.ServiceDesc for OfficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +172,10 @@ var OfficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOfficeList",
 			Handler:    _OfficeService_GetOfficeList_Handler,
+		},
+		{
+			MethodName: "GetOfficeByUUID",
+			Handler:    _OfficeService_GetOfficeByUUID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

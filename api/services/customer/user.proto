@@ -9,16 +9,22 @@ import "google/protobuf/timestamp.proto";
 
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
-        option (google.api.http) = {
-            post: "/customer/users"
-            body: "*"
-        };
+      option (google.api.http) = {
+          post: "/customer/users"
+          body: "*"
+      };
     }
 
     rpc GetUserList(GetUserListRequest) returns (GetUserListResponse) {
-        option (google.api.http) = {
-            get: "/customer/users"
-        };
+      option (google.api.http) = {
+        get: "/customer/users"
+      };
+    }
+
+    rpc GetUserByUUID(GetUserByUUIDRequest) returns (GetUserByUUIDResponse) {
+      option (google.api.http) = {
+        get: "/customer/users/uuid"
+      };
     }
 }
 
@@ -36,6 +42,14 @@ message GetUserListRequest {
 
 message GetUserListResponse {
   repeated User result = 1;
+}
+
+message GetUserByUUIDRequest {
+  string user_uuid= 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetUserByUUIDResponse {
+  User result = 1;
 }
 
 message User {

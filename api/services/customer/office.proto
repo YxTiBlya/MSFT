@@ -20,6 +20,12 @@ service OfficeService {
             get: "/customer/offices"
         };
     }
+
+    rpc GetOfficeByUUID(GetOfficeByUUIDRequest) returns (GetOfficeByUUIDResponse) {
+        option (google.api.http) = {
+            get: "/customer/offices/uuid"
+        };
+    }
 }
 
 message CreateOfficeRequest {
@@ -33,6 +39,14 @@ message GetOfficeListRequest {}
 
 message GetOfficeListResponse {
     repeated Office result = 1;
+}
+
+message GetOfficeByUUIDRequest {
+    string office_uuid = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetOfficeByUUIDResponse {
+    Office result = 1;
 }
 
 message Office {
