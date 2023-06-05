@@ -1,22 +1,22 @@
 restaurant_grpc_service_port = 5001
 restaurant_http_service_port = 5002
-restaurant_host = "restaurant"
+restaurant_host = "restaurant" #restaurant
 
 customer_grpc_service_port   = 5003
 customer_http_service_port   = 5004
-customer_host = "customer"
+customer_host = "customer" #customer
 
 statistics_grpc_service_port = 5005
 statistics_http_service_port = 5006
-statistics_host = "statistics"
+statistics_host = "statistics" #statistics
 
-rabbitmq_host = "rmq"
+rabbitmq_host = "rmq" #rmq
 rabbitmq_port = 5672
 rabbitmq_queue_name = "queue"
 
 postgres_username = "yxtiblya"
 postgres_password = "password"
-postgres_host     = "db"
+postgres_host     = "db" #db
 postgres_port     = 5432
 postgres_dbname   = "MSFT"
 postgres_ssl      = "disable"
