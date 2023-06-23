@@ -1,4 +1,4 @@
-module github.com/MSFT
+module github.com/YxTiBlya/MSFT
 
 go 1.20
 
